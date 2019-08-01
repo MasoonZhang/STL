@@ -17,23 +17,23 @@ namespace STL {
 
 	template<class ForwardIterator>
 	inline void destroy(ForwardIterator first, ForwardIterator last) {
-		_destroy(first, last, value_type(first));
+		__destroy(first, last, value_type(first));
 	}
 
 	template<class ForwardIterator>
-	inline void _destroy(ForwardIterator first, ForwardIterator last) {
-		using is_POD_type = typename _type_traits<ForwardIterator>::is_POD_type;
-		_destroy_aux(first, last, is_POD_type());
+	inline void __destroy(ForwardIterator first, ForwardIterator last) {
+		using is_POD = typename __type_traits<ForwardIterator>::is_POD_type;
+		__destroy_aux(first, last, is_POD());
 	}
 
 	template<class ForwardIterator>
-	inline void _destroy(ForwardIterator first, ForwardIterator last, _false_type) {
+	inline void __destroy(ForwardIterator first, ForwardIterator last, __false_type) {
 		for (; first != last; ++first)
 			destory(&*first);
 	}
 
 	template<class ForwardIterator>
-	inline void _destroy_aux(ForwardIterator first, ForwardIterator last, _true_type) {}
+	inline void __destroy_aux(ForwardIterator first, ForwardIterator last, __true_type) {}
 
 	inline void destroy(char*, char*) {}
 	inline void destroy(wchar_t*, wchar_t*) {}
