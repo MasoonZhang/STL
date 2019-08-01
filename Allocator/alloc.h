@@ -7,12 +7,12 @@
 namespace STL {
 
 	template <int inst>
-	class _malloc_alloc_template {
+	class __malloc_alloc_template {
 
 	private:
 		static void* oom_malloc(size_t);
 		static void* oom_realloc(void*, size_t);
-		static void(*_malloc_alloc_oom_handler)();
+		static void(*__malloc_alloc_oom_handler)();
 
 	public:
 		static void* allocate(size_t n) {
@@ -34,22 +34,22 @@ namespace STL {
 		}
 
 		static void(*set_malloc_handler(void(*f)()))() {
-			void (*old)() = _malloc_alloc_oom_handler;
-			_malloc_alloc_oom_handler = f;
+			void (*old)() = __malloc_alloc_oom_handler;
+			__malloc_alloc_oom_handler = f;
 			return old;
 		}
 	};
 
 	template <int inst>
-	void(*_malloc_alloc_template<inst>::_malloc_alloc_oom_handler)() = nullptr;
+	void(*__malloc_alloc_template<inst>::__malloc_alloc_oom_handler)() = nullptr;
 
 	template <int inst>
-	void* _malloc_alloc_template<inst>::oom_malloc(size_t n) {
+	void* __malloc_alloc_template<inst>::oom_malloc(size_t n) {
 		void(*my_malloc_handler)();
 		void* result;
 
 		for (;;) {
-			my_malloc_handler = _malloc_alloc_oom_handler;
+			my_malloc_handler = __malloc_alloc_oom_handler;
 			if (my_malloc_handler == nullptr)
 				throw std::bad_alloc();
 			(*my_malloc_handler)();
@@ -60,7 +60,7 @@ namespace STL {
 	}
 
 	template <int inst>
-	void* _malloc_alloc_template<inst>::oom_realloc(void* p, size_t n) {
+	void* __malloc_alloc_template<inst>::oom_realloc(void* p, size_t n) {
 		void(*my_malloc_handler)();
 		void* result;
 
@@ -74,10 +74,10 @@ namespace STL {
 		}
 	}
 
-	enum { _ALIGN = 8, _MAX_BYTES = 128, _NFREELISTS = _MAX_BYTES / _ALIGN };
+	enum { __ALIGN = 8, __MAX_BYTES = 128, __NFREELISTS = __MAX_BYTES / __ALIGN };
 
 	template <bool threads, int inst>
-	class _default_alloc_template {
+	class __default_alloc_template {
 
 	private:
 		static size_t ROUND_UP(size_t bytes) {
@@ -107,27 +107,27 @@ namespace STL {
 	};
 
 	template <bool threads, int inst>
-	char *_default_alloc_template<threads, inst>::start_free = nullptr;
+	char * __default_alloc_template<threads, inst>::start_free = nullptr;
 
 	template <bool threads, int inst>
-	char* _default_alloc_template<threads, inst>::end_free = nullptr;
+	char* __default_alloc_template<threads, inst>::end_free = nullptr;
 
 	template <bool threads, int inst>
-	size_t _default_alloc_template<threads, inst>::heap_size = 0;
+	size_t __default_alloc_template<threads, inst>::heap_size = 0;
 
 	template <bool threads, int inst>
-	_default_alloc_template<threads, inst>::obj* volatile 
-	_default_alloc_template<threads, inst>::free_list[_NFREELISTS] = {
+	__default_alloc_template<threads, inst>::obj* volatile
+		__default_alloc_template<threads, inst>::free_list[_NFREELISTS] = {
 		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr
 	};
 
 	template <bool threads, int inst>
-	void *_default_alloc_template<threads, inst>::allocate(size_t n) {
+	void * __default_alloc_template<threads, inst>::allocate(size_t n) {
 		obj* volatile *my_free_list;
 		obj* result;
 		if (n > static_cast<size_t>(_MAX_BYTES)) {
-			return _malloc_alloc_template<0>::allocate(n);
+			return __malloc_alloc_template<0>::allocate(n);
 		}
 		my_free_list = free_list + FREE_LIST_INDEX(n);
 		result = *my_free_list;
@@ -140,12 +140,12 @@ namespace STL {
 	}
 
 	template <bool threads, int inst>
-	void _default_alloc_template<threads, inst>::deallocate(void* p, size_t n) {
+	void __default_alloc_template<threads, inst>::deallocate(void* p, size_t n) {
 		obj* q = reinterpret_cast<obj *>(p);
 		obj* volatile *my_free_list;
 
 		if (n > (size_t)_MAX_BYTES) {
-			_malloc_alloc_template<0>::deallocate(p, n);
+			__malloc_alloc_template<0>::deallocate(p, n);
 			return;
 		}
 
@@ -155,7 +155,7 @@ namespace STL {
 	}
 
 	template <bool threads, int inst>
-	void *_default_alloc_template<threads, inst>::refill(size_t n) {
+	void * __default_alloc_template<threads, inst>::refill(size_t n) {
 		int nobjs = 20;
 		char* chunk = chunk_alloc(n, nobjs);
 		obj* volatile *my_free_list;
@@ -184,7 +184,7 @@ namespace STL {
 	}
 
 	template <bool threads, int inst>
-	char *_default_alloc_template<threads, inst>::chunk_alloc(size_t size, int& nobjs) {
+	char * __default_alloc_template<threads, inst>::chunk_alloc(size_t size, int& nobjs) {
 		char* result;
 		size_t total_bytes = size * nobjs;
 		size_t bytes_left = end_free - start_free;
@@ -223,7 +223,7 @@ namespace STL {
 					}
 				}
 				end_free = nullptr;
-				start_free = reinterpret_cast<char*>(_malloc_alloc_template<0>::allocate(bytes_to_get));
+				start_free = reinterpret_cast<char*>(__malloc_alloc_template<0>::allocate(bytes_to_get));
 			}
 			heap_size += bytes_to_get;
 			end_free = start_free + bytes_to_get;
@@ -232,7 +232,7 @@ namespace STL {
 	}
 
 	template <bool threads, int inst>
-	void *_default_alloc_template<threads, inst>::reallocate(void* p, size_t old_sz, size_t new_sz) {
+	void * __default_alloc_template<threads, inst>::reallocate(void* p, size_t old_sz, size_t new_sz) {
 		void* result;
 		size_t copy_sz;
 
