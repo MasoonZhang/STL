@@ -6,7 +6,7 @@
 
 namespace STL {
 
-	template <class T, class Alloc = simplealloc<T> >
+	template <class T, class Alloc = simpleAlloc<T> >
 	class vector {
 
 	public:
