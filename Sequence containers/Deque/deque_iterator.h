@@ -30,6 +30,10 @@ namespace STL {
 		T* last;
 		map_pointer node;
 
+		__deque_iterator() : cur(nullptr), first(nullptr), last(nullptr), node(nullptr) { }
+
+		__deque_iterator(pointer x, map_pointer y) : cur(x), first(*y), last(*y + buffer_size()), node(y) { }
+
 		void set_node(map_pointer new_node) {
 			node = new_node;
 			first = *new_node;
