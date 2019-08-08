@@ -22,9 +22,12 @@ namespace STL {
 	public:
 		bool empty() const noexcept { return c.empty(); }
 		size_type size() const noexcept { return c.size(); }
-		const_reference top() { return c.back(); }
+		reference front() noexcept { return c.front(); }
+		const_reference front() const noexcept { return c.front(); }
+		reference back() noexcept { return c.back(); }
+		const_reference back() const noexcept { return c.back(); }
 		void push(const value_type& x) { c.push_back(x); }
-		void pop() { c.pop_back(); }
+		void pop() { c.pop_front(); }
 	};
 
 	template <class T, class Sequence>
