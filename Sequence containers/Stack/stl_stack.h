@@ -22,7 +22,7 @@ namespace STL {
 	public:
 		bool empty() const noexcept { return c.empty(); }
 		size_type size() const noexcept { return c.size(); }
-		const_reference top() { return c.back(); }
+		const_reference top() const noexcept { return c.back(); }
 		void push(const value_type& x) { c.push_back(x); }
 		void pop() { c.pop_back(); }
 	};
