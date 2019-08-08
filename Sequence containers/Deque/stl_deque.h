@@ -56,6 +56,7 @@ namespace STL {
 		}
 
 	public:
+		const_reference front() const noexcept { return *start; }
 		const_reference back() const noexcept { return *(finish - 1); }
 
 	public:
