@@ -56,6 +56,9 @@ namespace STL {
 		}
 
 	public:
+		const_reference back() const noexcept { return *(finish - 1); }
+
+	public:
 		iterator begin() noexcept { return start; }
 		iterator end() noexcept { return finish; }
 		reference operator[](size_type n) {
