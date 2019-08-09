@@ -83,4 +83,65 @@ namespace STL {
 			parent--;
 		}
 	}
+
+	template <class RandomAccessIterator,
+		class Compare = less<value_type<RandomAccessIterator>>>
+		inline void push_heap(RandomAccessIterator first, RandomAccessIterator last,
+			const Compare & comp = Compare()) {
+		using Distance = difference_type_t<RandomAccessIterator>;
+		using T = value_type_t<RandomAccessIterator>;
+		push_heap_aux(first, Distance((last - first) - 1), Distance(0),
+			T(*(last - 1)), comp);
+	}
+
+	template <class RandomAccessIterator, class Distance, class T, class Compare>
+	void push_heap_aux(RandomAccessIterator first, Distance holeIndex,
+		Distance topIndex, T value,
+		const Compare & comp = Compare()) {
+		Distance parent = (holeIndex - 1) / 2;
+		while (holeIndex > topIndex &&
+			comp(*(first + parent), value)) {
+			*(first + holeIndex) = *(first + parent);
+			holeIndex = parent;
+			parent = (holeIndex - 1) / 2;
+		}
+		*(first + holeIndex) = value;
+	}
+
+	template <class RandomAccessIterator, class Compare = less<value_type<RandomAccessIterator>>>
+		inline void pop_heap(RandomAccessIterator first, RandomAccessIterator last,
+			const Compare & comp = Compare()) {
+		using T = value_type_t<RandomAccessIterator>;
+		pop_heap_aux(first, last - 1, last - 1, T(*(last - 1)), comp);
+	}
+
+	template <class RandomAccessIterator, class T, class Compare>
+	inline void pop_heap_aux(RandomAccessIterator first, RandomAccessIterator last,
+		RandomAccessIterator result, T value,
+		const Compare & comp = Compare()) {
+		using Distance = difference_type_t<RandomAccessIterator>;
+		*result = *first;
+		adjust_heap(first, Distance(0), Distance(last - first), value, comp);
+	}
+
+	template <class RandomAccessIterator, class Distance, class T, class Compare>
+	void adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len,
+		T value, const Compare& comp = Compare()) {
+		Distance topIndex = holeIndex;
+		Distance secondChild = 2 * holeIndex + 2;
+		while (secondChild < len) {
+			if (comp(*(first + secondChild),
+				*(first + (secondChild - 1))))
+				secondChild--;
+			*(first + holeIndex) = *(first + secondChild);
+			holeIndex = secondChild;
+			secondChild = 2 * (holeIndex + 1);
+		}
+		if (secondChild ==
+			len) {
+			*(first + holeIndex) = *(first + (secondChild - 1));
+			holeIndex = secondChild - 1;
+		}
+		push_heap_aux(first, holeIndex, topIndex, value, comp);
+	}
 }
