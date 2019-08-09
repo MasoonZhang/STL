@@ -14,6 +14,7 @@ namespace STL {
 		using pointer = value_type *;
 		using iterator = value_type *;
 		using reference = value_type &;
+		using const_reference = const value_type &;
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
@@ -46,6 +47,9 @@ namespace STL {
 			finish = start + n;
 			end_of_storage = finish;
 		}
+
+	public:
+		const_reference front() const noexcept { return *begin(); }
 
 	public:
 		iterator begin() noexcept { return start; }
