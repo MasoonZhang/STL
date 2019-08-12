@@ -99,12 +99,12 @@ namespace STL {
 	};
 
 	template <class Key, class Compare, class Alloc>
-	inline bool operator==(const set<Key, Compare, Alloc>& x, const set<Key, Compare, Alloc>& y) {
+	inline bool operator==(const multiset<Key, Compare, Alloc>& x, const multiset<Key, Compare, Alloc>& y) {
 		return x.t == y.t;
 	}
 
 	template <class Key, class Compare, class Alloc>
-	inline bool operator<(const set<Key, Compare, Alloc>& x, const set<Key, Compare, Alloc>& y) {
+	inline bool operator<(const multiset<Key, Compare, Alloc>& x, const multiset<Key, Compare, Alloc>& y) {
 		return x.t < y.t;
 	}
 }
