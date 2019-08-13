@@ -3,7 +3,6 @@
 #include "hash_func.h"
 #include "hashtable.h"
 
-
 namespace STL {
 
 	template <class Value, class HashFcn = hash<Value>, class EqualKey = equal_to<Value>, class Alloc = simpleAlloc<Value> >
@@ -40,19 +39,19 @@ namespace STL {
 			rep.insert_unique(f, l);
 		}
 		template <class InputIterator>
-		hash_set(InputIterator first, InputIterator last, size_type n)
+		hash_set(InputIterator f, InputIterator l, size_type n)
 			: rep(n, hasher(), key_equal()) {
-			rep.insert_unique(first, last);
+			rep.insert_unique(f, l);
 		}
 		template <class InputIterator>
-		hash_set(InputIterator first, InputIterator last, size_type n, const hasher& hf)
+		hash_set(InputIterator f, InputIterator l, size_type n, const hasher& hf)
 			: rep(n, hf, key_equal()) {
-			rep.insert_unique(first, last);
+			rep.insert_unique(f, l);
 		}
 		template <class InputIterator>
-		hash_set(InputIterator first, InputIterator last, size_type n, const hasher& hf, const key_equal& eql)
+		hash_set(InputIterator f, InputIterator l, size_type n, const hasher& hf, const key_equal& eql)
 			: rep(n, hf, eql()) {
-			rep.insert_unique(first, last);
+			rep.insert_unique(f, l);
 		}
 
 	public:
@@ -71,8 +70,8 @@ namespace STL {
 			return pair<iterator, bool>(p.first, p.second);
 		}
 		template <class InputIterator>
-		void insert(InputIterator first, InputIterator last) {
-			rep.insert_unique(first, last);
+		void insert(InputIterator f, InputIterator l) {
+			rep.insert_unique(f, l);
 		}
 		pair<iterator, bool> insert_noresize(const value_type& obj) {
 			pair<typename ht::iterator, bool> p = rep.insert_unique_noresize(obj);
