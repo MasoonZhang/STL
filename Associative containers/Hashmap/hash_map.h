@@ -80,7 +80,7 @@ namespace STL {
 			rep.insert_unique(f, l);
 		}
 		pair<iterator, bool> insert_noresize(const value_type& obj) {
-			return rep.insert_unique(obj);
+			return rep.insert_unique_noresize(obj);
 		}
 
 		iterator find(const key_type& key) const { return rep.find(key); }
@@ -102,7 +102,6 @@ namespace STL {
 		size_type erase(const key_type& key) { return rep.erase(key); }
 		void erase(iterator it) { rep.erase(it); }
 		void erase(iterator f, iterator l) { rep.erase(f, l); }
-
 		void clear() { rep.clear(); }
 
 	public:
