@@ -184,6 +184,9 @@ namespace STL {
 			return hash(key) % n;
 		}
 
+		void erase_bucket(const size_type n, node* first, node* last);
+		void erase_bucket(const size_type n, node* last);
+
 	private:
 		pair<iterator, bool> insert_unique_noreseize(const value_type& obj) {
 			const size_type n = bkt_num(obj);
@@ -220,6 +223,80 @@ namespace STL {
 		}
 
 	public:
+		size_type erase(const key_type& key) {
+			const size_type n = bkt_num_key(key);
+			node* first = buckets[n];
+			size_type erased = 0;
+			if (first) {
+				node* cur = first;
+				node* next = cur->next;
+				while (next) {
+					if (equals(get_key(next->val), key)) {
+						cur->next = next->next;
+						delete_node(next);
+						next = cur->next;
+						++erased;
+						--num_elements;
+					}
+					else {
+						cur = next;
+						next = cur->next;
+					}
+				}
+				if (equals(get_key(first->val), key)) {
+					buckets[n] = first->next;
+					delete_node(first);
+					++erased;
+					--num_elements;
+				}
+			}
+			return erased;
+		}
+		void erase(iterator pos) {
+			node* p = pos.cur;
+			if (p) {
+				const size_type n = bkt_num(p->val);
+				node* cur = buckets[n];
+				if (cur == p) {
+					buckets[n] = cur->next;
+					delete_node(cur);
+					--num_elements;
+				}
+				else {
+					node* next = cur->next;
+					while (next) {
+						if (next == p) {
+							cur->next = next->next;
+							delete_node(next);
+							--num_elements;
+							break;
+						}
+						else {
+							cur = next;
+							next = cur->next;
+						}
+					}
+				}
+			}
+		}
+		void erase(iterator first, iterator last) {
+			size_type f_bucket = first.cur ? bkt_num(first.cur->val) : buckets.size();
+			size_type l_bucket = last.cur ? bkt_num(last.cur->val) : buckets.size();
+			if (first.cur == last.cur)
+				return;
+			else if (f_bucket == l_bucket)
+				erase_bucket(f_bucket, first.cur, last.cur);
+			else {
+				erase_bucket(f_bucket, first.cur, nullptr);
+				for (size_type n = f_bucket + 1; n < l_bucket; ++n)
+					erase_bucket(n, nullptr);
+				if (l_bucket != buckets.size())
+					erase_bucket(l_bucket, last.cur);
+			}
+		}
+		void clear();
+
+	public:
 		hashtable(size_type n, const hasher& hf, const key_equal& eql)
 			: hash(hf), equals(eql), get_key(ExtractKey()), num_elements(0) {
 			initialize_buckets(n);
@@ -229,6 +306,19 @@ namespace STL {
 		void resize(size_type);
 
 	public:
+		reference find_or_insert(const value_type&) {
+			resize(num_elements + 1);
+			size_type n = bkt_num(obj);
+			node* first = buckets[n];
+			for (node* cur = first; cur; cur = cur->next)
+				if (equals(get_key(cur->val), get_key(obj)))
+					return cur->val;
+			node* tmp = new_node(obj);
+			tmp->next = first;
+			buckets[n] = tmp;
+			++num_elements;
+			return tmp->val;
+		}
 		iterator find(const key_type& key) {
 			size_type n = bkt_num_key(key);
 			node* first;
@@ -243,6 +333,21 @@ namespace STL {
 					++result;
 			return result;
 		}
+		pair<iterator, iterator> equal_range(const key_type& key) {
+			using pii = pair<iterator, iterator>;
+			const size_type n = bkt_num_key(key);
+			for (node* first = buckets[n]; first; first = first->next)
+				if (equals(get_key(first->val), key)) {
+					for (node* cur = first->next; cur; cur = cur->next)
+						if (!equals(get_key(cur->val), key))
+							return pii(iterator(first, this), iterator(cur, this));
+					for (size_type m = n + 1; m < buckets.size(); ++m)
+						if (buckets[m])
+							return pii(iterator(first, this), iterator(buckets[m], this));
+					return pii(iterator(first, this), end());
+				}
+			return pii(end(), end());
+		}
 
 	public:
 		pair<iterator, bool> insert_unique(const value_type& obj) {
@@ -256,14 +361,51 @@ namespace STL {
 		void copy_from(const hashtable&);
 
 	public:
-		void clear();
-
-	public:
+		hasher hash_funct() const noexcept { return hash; }
+		key_equal key_eq() const noexcept { return equals; }
 		size_type bucket_count() const { return buckets.size(); }
 		size_type max_bucket_count() const {
 			return __stl_prime_list[__stl_num_primes - 1];
 		}
+	public:
+		void swap(hashtable& rhs) noexcept {
+			std::swap(hash, rhs.hash);
+			std::swap(equals, rhs.equals);
+			std::swap(get_key, rhs.get_key);
+			buckets.swap(rhs.buckets);
+			std::swap(num_elements, rhs.num_elements);
+		}
 	};
+
+	template <class Value, class Key, class HashFcn, class ExtractKey, class EqualKey, class Alloc>
+	void hashtable<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>::erase_bucket(const size_type n, node* first, node* last) {
+		node* cur = buckets[n];
+		if (cur == first)
+			erase_bucket(n, last);
+		else {
+			node* next;
+			for (next = cur->next; next != first; cur = next, next = next->next)
+				;
+			while (next != last) {
+				cur->next = next->next;
+				delete_node(next);
+				next = cur->next;
+				--num_elements;
+			}
+		}
+	}
+
+	template <class Value, class Key, class HashFcn, class ExtractKey, class EqualKey, class Alloc>
+	void hashtable<Value, Key, HashFcn, ExtractKey, EqualKey, Alloc>::erase_bucket(const size_type n, node* last) {
+		node* cur = buckets[n];
+		while (cur != last) {
+			node* next = cur->next;
+			delete_node(cur);
+			cur = next;
+			buckets[n] = cur;
+			--num_elements;
+		}
+	}
 
 	template <class V, class K, class HF, class Ex, class Eq, class A>
 	void hashtable<V, K, HF, Ex, Eq, A>::resize(size_type num_elements_hint) {
