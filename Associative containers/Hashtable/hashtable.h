@@ -188,7 +188,7 @@ namespace STL {
 		void erase_bucket(const size_type n, node* last);
 
 	private:
-		pair<iterator, bool> insert_unique_noreseize(const value_type& obj) {
+		pair<iterator, bool> insert_unique_noresize(const value_type& obj) {
 			const size_type n = bkt_num(obj);
 			node* first = buckets[n];
 
