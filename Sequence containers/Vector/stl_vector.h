@@ -59,6 +59,10 @@ namespace STL {
 		bool empty() const noexcept { return start == finish; }
 		reference operator[](size_type n) { return *(start + n); }
 
+	public:
+		void swap(vector&) noexcept;
+
+	public:
 		vector() : start(nullptr), finish(nullptr), end_of_storage(nullptr) { }
 		vector(size_type n, const T& value) { fill_initialize(n, value); }
 		vector(int n, const T& value) { fill_initialize(n, value); }
@@ -99,6 +103,7 @@ namespace STL {
 				insert(finish, new_size - finish, x);
 		}
 		void resize(size_type new_size) { return resize(new_size, T()); }
+		void reserve(size_type);
 		void clear() { erase(start, finish); }
 		void insert(iterator position, size_type n, const T& x) {
 			if (n != 0) {
@@ -146,6 +151,25 @@ namespace STL {
 			}
 		}
 	};
+	template <class T, class Alloc>
+	inline void vector<T, Alloc>::swap(vector& rhs) noexcept {
+		STL::swap(start, rhs.start);
+		STL::swap(finish, rhs.finish);
+		STL::swap(end_of_storage, rhs.end_of_storage);
+	}
+
+	template <class T, class Alloc>
+	inline void vector<T, Alloc>::reserve(size_type new_capacity) {
+		if (new_capacity <= capacity()) return;
+		T* new_start = data_allocator::allocate(new_capacity);
+		T* new_finish = STL::uninitialized_copy(start, finish, new_start);
+		destroy(start, finish);
+		deallocate();
+		start = new_start;
+		finish = new_finish;
+		end_of_storage = start + new_capacity;
+
+	}
 	
 	template <class T, class Alloc>
 	void vector<T, Alloc>::insert_aux(iterator position, const T& x) {
