@@ -3,7 +3,6 @@
 #include "hash_func.h"
 #include "hashtable.h"
 
-
 namespace STL {
 
 	template <class Value, class HashFcn = hash<Value>, class EqualKey = equal_to<Value>, class Alloc = simpleAlloc<Value> >
