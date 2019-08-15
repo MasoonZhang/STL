@@ -14,7 +14,7 @@ namespace STL {
 	inline void __push_heap_aux(RandomAccessIterator first, RandomAccessIterator last, Distance*, T*) {
 		__push_heap(first, Distance((last - first) - 1, ), Distance(0), T(*(last - 1));
 	}
-	
+
 	template <class RandomAccessIterator, class Distance, class T>
 	void __push_heap(RandomAccessIterator first, Distance holeIndex, Distance topIndex, T value) {
 		Distance parent = (holeIndex - 1) / 2;
@@ -97,7 +97,7 @@ namespace STL {
 	template <class RandomAccessIterator, class Distance, class T, class Compare>
 	void push_heap_aux(RandomAccessIterator first, Distance holeIndex,
 		Distance topIndex, T value,
-		const Compare & comp = Compare()) {
+		const Compare& comp = Compare()) {
 		Distance parent = (holeIndex - 1) / 2;
 		while (holeIndex > topIndex &&
 			comp(*(first + parent), value)) {
@@ -109,8 +109,8 @@ namespace STL {
 	}
 
 	template <class RandomAccessIterator, class Compare = less<value_type<RandomAccessIterator>>>
-		inline void pop_heap(RandomAccessIterator first, RandomAccessIterator last,
-			const Compare & comp = Compare()) {
+	inline void pop_heap(RandomAccessIterator first, RandomAccessIterator last,
+		const Compare & comp = Compare()) {
 		using T = value_type_t<RandomAccessIterator>;
 		pop_heap_aux(first, last - 1, last - 1, T(*(last - 1)), comp);
 	}
@@ -118,7 +118,7 @@ namespace STL {
 	template <class RandomAccessIterator, class T, class Compare>
 	inline void pop_heap_aux(RandomAccessIterator first, RandomAccessIterator last,
 		RandomAccessIterator result, T value,
-		const Compare & comp = Compare()) {
+		const Compare& comp = Compare()) {
 		using Distance = difference_type_t<RandomAccessIterator>;
 		*result = *first;
 		adjust_heap(first, Distance(0), Distance(last - first), value, comp);
@@ -137,8 +137,7 @@ namespace STL {
 			holeIndex = secondChild;
 			secondChild = 2 * (holeIndex + 1);
 		}
-		if (secondChild ==
-			len) {
+		if (secondChild == len) {
 			*(first + holeIndex) = *(first + (secondChild - 1));
 			holeIndex = secondChild - 1;
 		}
