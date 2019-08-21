@@ -106,4 +106,208 @@ namespace STL {
 	inline void advance(InputIterator& i, Distance n) {
 		__advance(i, n, iteraotr_category(i));
 	}
+
+	template <class Container>
+	class back_insert_iterator {
+	protected:
+		Container* container;
+	public:
+		using iterator_category = output_iterator_tag;
+		using value_tyep = void;
+		using difference_type = void;
+		using pointer = void;
+		using reference = void;
+
+		explicit back_insert_iterator(Container& x) : container(&x) { }
+		back_insert_iterator<Container>& operator=(const typename Container::value_type& value) {
+			container->push_back(value);
+			return *this;
+		}
+		back_insert_iterator<Container>& operator*() { return *this; }
+		back_insert_iterator<Container>& operator++() { return *this; }
+		back_insert_iterator<Container>& operator++(int) { return *this; }
+	};
+
+	template <class Container>
+	inline back_insert_iterator<Container> back_inserter(Container& x) {
+		return back_insert_iterator<Container>(x);
+	}
+
+	template <class Container>
+	class front_insert_iterator {
+	protected:
+		Container* container;
+	public:
+		using iterator_category = output_iterator_tag;
+		using value_tyep = void;
+		using difference_type = void;
+		using pointer = void;
+		using reference = void;
+
+		explicit front_insert_iterator(Container& x) : container(&x) { }
+		front_insert_iterator<Container>& operator=(const typename Container::value_type& value) {
+			container->push_back(value);
+			return *this;
+		}
+		front_insert_iterator<Container>& operator*() { return *this; }
+		front_insert_iterator<Container>& operator++() { return *this; }
+		front_insert_iterator<Container>& operator++(int) { return *this; }
+	};
+
+	template <class Container>
+	inline front_insert_iterator<Container> front_inserter(Container& x) {
+		return front_insert_iterator<Container>(x);
+	}
+
+	template <class Container>
+	class insert_iterator {
+	protected:
+		Container* container;
+		typename Container::iterator iter;
+	public:
+		using iterator_category = output_iterator_tag;
+		using value_tyep = void;
+		using difference_type = void;
+		using pointer = void;
+		using reference = void;
+
+		explicit insert_iterator(Container& x, typename Container::iterator i) : container(&x), iter(i) { }
+		insert_iterator<Container>& operator=(const typename Container::value_type& value) {
+			iter = container->insert(iter, value);
+			++iter;
+			return *this;
+		}
+		insert_iterator<Container>& operator*() { return *this; }
+		insert_iterator<Container>& operator++() { return *this; }
+		insert_iterator<Container>& operator++(int) { return *this; }
+	};
+
+	template <class Container, class Iterator>
+	inline insert_iterator<Container> inserter(Container& x, Iterator i) {
+		using iter = typename Container::iterator;
+		return insert_iterator<Container>(x, iter(i));
+	}
+
+	template <class Iterator>
+	class reverse_iterator {
+	protect:
+		Iterator current;
+	public:
+		using iterator_category = typename iterator_traits<Iterator>::iterator_catogory;
+		using value_type = typename iterator_traits<Iterator>::value_type;
+		using difference_type = typename iterator_traits<Iterator>::difference_type;
+		using pointer = typename iterator_traits<Iterator>::pointer;
+		using reference = typename iterator_traits<Iterator>::reference;
+
+		using iterator_type = Iterator;
+		using self = reverse_iterator<Iterator>;
+
+	public:
+		reverse_iterator() { }
+		explicit reverse_iterator(iterator_type x) : current(x) { }
+		reverse_iterator(const self& x) : current(x.current) { }
+
+		iterator_type base() const { return current; }
+		reference operator*() const {
+			Iterator tmp = current;
+			return *--tmp;
+		}
+		pointer operator->() const { return &(operator*()); }
+
+		self& operator++() {
+			--current;
+			return *this;
+		}
+		self operator++(int) {
+			self tmp = *this;
+			--current;
+			return tmp;
+		}
+		self& operator--() {
+			++current;
+			return *this;
+		}
+		self operator--(int) {
+			self tmp = *this;
+			++current;
+			return tmp;
+		}
+		self operator+(difference_type n) const {
+			return self(current - n);
+		}
+		self& operator+=(difference_type n) const {
+			current -= n;
+			return *this;
+		}
+		self operator-(difference_type n) const {
+			return self(current + n);
+		}
+		self& operator-=(difference_type n) const {
+			current += n;
+			return *this;
+		}
+		reference operator[](difference_type n) const { return *(*this + n); }
+	};
+
+	template <class T, class Distance = ptrdiff_t>
+	class istream_iterator {
+		//friend bool operator==(const istream_iterator<T, Distance> x, const istream_iterator<T, Distance> y);
+	protected:
+		istream* stream;
+		T value;
+		bool end_marker;
+		void read() {
+			end_marker = (*stream) ? true : false;
+			if (end_marker) *stream >> value;
+			end_marker = (*stream) ? true : false;
+		}
+	public:
+		using iterator_category = input_iterator_tag;
+		using value_tyep = T;
+		using difference_type = Distance;
+		using pointer = const T*;
+		using reference = const T &;
+
+		istream_iterator() : stream(&cin), end_marker(false) { }
+		istream_iterator(istream& s) : stream(&s) { read(); }
+
+		reference operator*() const { return value; }
+		pointer operator->() const { return &(operator*()); }
+
+		istream_iterator<T, Distance> operator++() {
+			read();
+			return *this;
+		}
+		istream_iterator<T, Distance> operator++(int) {
+			istream_iterator<T, Distance> tmp = *this;
+			read();
+			return tmp;
+		}
+	};
+
+	template <class T>
+	class ostream_iterator {
+	protected:
+		ostream* stream;
+		const char* string;
+
+	public:
+		using iterator_category = output_iterator_tag;
+		using value_tyep = void;
+		using difference_type = void;
+		using pointer = void;
+		using reference = void;
+
+		ostream_iterator(ostream& s) : stream(&s), string(0) { }
+		ostream_iterator(ostream& s, const char* c) : stream(&s), string(c) { }
+
+		ostream_iterator<T>& operator=(const T& value) {
+			*stream << value;
+			if (string) *stream << string;
+			return *this;
+		}
+		ostream_iterator<T>& operator*() { return *this; }
+		ostream_iterator<T>& operator++() { return *this; }
+		ostream_iterator<T>& operator++(int) { return *this; }
+	};
 }
