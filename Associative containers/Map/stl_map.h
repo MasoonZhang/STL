@@ -5,7 +5,7 @@
 
 namespace STL {
 
-	template <class Key, class T, class Compare = less<key>, class Alloc = alloc>
+	template <class Key, class T, class Compare = less<Key>, class Alloc = simpleAlloc<Key> >
 	class map {
 		using key_type = Key;
 		using data_type = T;
