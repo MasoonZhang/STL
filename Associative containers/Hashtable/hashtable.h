@@ -126,7 +126,7 @@ namespace STL {
 		return pos == last ? *(last - 1) : *pos;
 	}
 
-	template <class Value, class Key, class HashFcn, class ExtractKey, class EqualKey, class Alloc = simpleAlloc<Value> >
+	template <class Value, class Key, class HashFcn, class ExtractKey, class EqualKey, class Alloc>
 	class hashtable {
 	public:
 		using hasher = HashFcn;
