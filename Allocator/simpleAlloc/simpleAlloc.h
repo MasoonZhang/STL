@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <iostream>
 
-namespace STL {
+namespace simpleAlloc {
 
 	template <class T>
 	inline T* __allocate(ptrdiff_t size, T*) {
