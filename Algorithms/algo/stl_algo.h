@@ -386,7 +386,7 @@ namespace STL {
 	}
 
 	template <class RandomAccessIterator, class Distance, class T>
-	void __rotate(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator initial, Distance shift, T*) {
+	void __rotate_cycle(RandomAccessIterator first, RandomAccessIterator last, RandomAccessIterator initial, Distance shift, T*) {
 		T value = *initial;
 		RandomAccessIterator ptr1 = initial;
 		RandomAccessIterator ptr2 = ptr1 + shift;
