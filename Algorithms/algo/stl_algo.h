@@ -394,7 +394,7 @@ namespace STL {
 			*ptr1 = *ptr2;
 			ptr1 = ptr2;
 			if (last - ptr2 > shift)
-				ptr += shift;
+				ptr2 += shift;
 			else
 				ptr2 = first + (shift - (last - ptr2));
 		}
